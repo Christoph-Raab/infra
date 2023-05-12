@@ -7,21 +7,53 @@ END="\033[0m"    # no color
 
 log() {
     local msg="$1"
-    echo -e "$msg"
+    local lvl="${2:-"-i"}"
+    local out
+
+    if [[ "$lvl" == "-i" ]];then
+        out="${LOG}$msg${END}"
+    else
+        out="${ERR}$msg${END}"
+    fi
+    echo -e "$out"
 }
 
-log "${LOG}Installing ansible...${END}"
+CLONE="${1:-"no"}"
+
+log "Updating apt cache..."
 sudo apt update
-sudo apt install -y software-properties-common
 
-sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt install -y ansible
+log "Checking for ansible..."
+if ! command -v ansible >/dev/null 2>&1; then
+    log "Installing ansible..."
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository --yes --update ppa:ansible/ansible
+    sudo apt install -y ansible
 
-if command -v ansible >/dev/null 2>&1; then
-    log "${LOG}Ansible installed successfully! Version is:${END}"
+    log "Ansible installed successfully! Version is:"
     ansible --version
-else
-    log "${ERR}Ansible not installed, something went wrong!${END}"
-    exit 1
+fi
+echo
+
+log "Checking additional requirements..."
+if ! command -v git >/dev/null 2>&1; then
+    log "- Installing git..."
+    sudo apt install git
 fi
 
+log "All requirements setup!"
+echo
+
+if [[ "$CLONE" == "--clone" ]];then
+    log "Cloning repo to $HOME/infra..."
+    target_dir="$HOME/infra"
+    if [[ -d "$target_dir" ]];then
+        log "Target dir $target_dir already exists, aborting..." -e
+        exit 1
+    else
+        git clone https://github.com/Christoph-Raab/infra.git "$target_dir"
+    fi
+    echo
+fi
+
+log "Preparation done!"
