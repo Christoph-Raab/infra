@@ -16,3 +16,5 @@
       apt: upgrade=dist
   roles:
     - basic
+  vars:
+    default_user: chris

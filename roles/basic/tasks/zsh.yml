@@ -1,0 +1,16 @@
+- name: Use zsh as default shell
+  tags: config
+  become: yes
+  user:
+    name: "{{ default_user}}"
+    shell: /bin/zsh
+
+- name: Add basic zshrc
+  tags: config
+  file:
+    path: /home/{{ default_user }}/.zshrc
+    state: touch
+    mode: u=rwx,g=r,o=r
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+
