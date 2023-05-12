@@ -1,0 +1,7 @@
+- name: Install basic packages
+  tags: packages
+  become: yes
+  apt:
+    state: present
+    name:
+    - vim
