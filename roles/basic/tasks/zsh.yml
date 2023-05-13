@@ -4,6 +4,7 @@
   user:
     name: "{{ default_user}}"
     shell: /bin/zsh
+  register: zsh_as_shell
 
 - name: Add basic zshrc
   tags: config
@@ -13,4 +14,5 @@
     mode: u=rwx,g=r,o=r
     owner: "{{ default_user }}"
     group: "{{ default_user }}"
+  when: zsh_as_shell.changed
 
